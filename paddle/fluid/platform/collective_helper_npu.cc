@@ -15,6 +15,7 @@
 #if defined(PADDLE_WITH_ASCEND_CL)
 #include "paddle/fluid/platform/collective_helper.h"
 #include <utility>
+#include <memory>
 
 namespace paddle {
 namespace platform {
@@ -45,7 +46,7 @@ class HCCLCommImpl : public HCCLComm {
 };
 
 HCCLComm* HCCLCommContext::CreateHCCLComm(const std::string& rank_table_file,
-                                          uint32_t rank, uint32_t device_id) const {
+                                          uint32_t rank, uint32_t device_id) {
 /*
   PADDLE_ENFORCE_NOT_NULL(rank_table_file,
                           platform::errors::InvalidArgument(
@@ -68,7 +69,7 @@ HCCLComm* HCCLCommContext::CreateHCCLComm(const std::string& rank_table_file,
 }
 
 HCCLComm* HCCLCommContext::AssignHCCLComm(const std::string& rank_table_file,
-		uint32_t rank, uint32_t device_id) const {
+		uint32_t rank, uint32_t device_id) {
   std::unique_ptr<NPUDeviceContext> dev_ctx(
       new NPUDeviceContext(NPUPlace(device_id)));
 
@@ -77,6 +78,8 @@ HCCLComm* HCCLCommContext::AssignHCCLComm(const std::string& rank_table_file,
   c->set_rank(rank);
   c->set_device_id(device_id);
   c->set_dev_ctx(std::move(dev_ctx));
+
+  comm_.reset(c);
 
   return c;
 }

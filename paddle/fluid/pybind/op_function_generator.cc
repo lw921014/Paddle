@@ -279,6 +279,7 @@ GenerateOpFunctions(const std::string& module_name) {
     if (!all_kernels.count(op_type)) {
       continue;
     }
+    std::cout << "op_proto type: " << op_type << std::endl;
     std::string input_args = "";
     std::string ins_initializer = "{";
     std::string ins_initializer_with_null = "";
@@ -326,7 +327,7 @@ GenerateOpFunctions(const std::string& module_name) {
     }
     ins_initializer += "}";
 
-    if (input_args.back() == ',') {
+    if (!input_args.empty() && input_args.back() == ',') {
       input_args.pop_back();
     }
 

@@ -107,7 +107,9 @@ void Compare(f::Scope* scope, const p::DeviceContext& ctx) {
 
 TEST(c_broadcast, NPU) {
   f::Scope scope;
-  p::NPUDeviceContext ctx(p::NPUPlace(0));
+  char *npu_id = getenv("FLAGS_selected_npus");
+
+  p::NPUDeviceContext ctx(p::NPUPlace(atoi(npu_id)));
   Prepare(&scope, ctx);
   Compare(&scope, ctx);
 }
