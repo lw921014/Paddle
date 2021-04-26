@@ -101,3 +101,6 @@ REGISTER_OP_WITHOUT_GRADIENT(c_sync_comm_stream, ops::CSyncCommStreamOp,
 
 REGISTER_OP_CUDA_KERNEL(c_sync_comm_stream,
                         ops::CSyncCommStreamCudaKernel<float>);
+
+REGISTER_OP_NPU_KERNEL(c_sync_comm_stream,
+                        ops::CSyncCommStreamCudaKernel<float>);
