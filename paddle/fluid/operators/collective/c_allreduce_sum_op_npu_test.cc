@@ -156,7 +156,7 @@ void TestHCCLAllReduceOp(f::Scope* scope, const p::DeviceContext& ctx,
   auto op = f::OpRegistry::CreateOp("c_allreduce_sum", {{"X", {"Data"}}},
                                     {{"Out", {"OutData"}}}, attrs);
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 2048; i++) {
     op->Run(*scope, place);
   }
   ctx.Wait();
