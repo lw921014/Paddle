@@ -46,8 +46,6 @@ class CCommInitOpAscend : public framework::OperatorBase {
     PADDLE_ENFORCE_NOT_NULL(
         var, platform::errors::InvalidArgument("Input con not be empty."));
 #if defined(PADDLE_WITH_ASCEND_CL)
-    HcclRootInfo* hccl_id = var->GetMutable<HcclRootInfo>();
-
     int rank_ids = Attr<int>("rank_ids");
     int rank_id = Attr<int>("rank");
     int rid = Attr<int>("ring_id");
@@ -55,8 +53,10 @@ class CCommInitOpAscend : public framework::OperatorBase {
     if (Attr<int>("device_id") >= 0) {
       device_id = Attr<int>("device_id");
     }
+    EcclCommGroupIdType group_name = Attr<EcclCommGroupIdType>("group_name");
+
     platform::HCCLCommContext::Instance().CreateHCCLComm(
-        hccl_id, rank_ids, rank_id, device_id, rid);
+        group_name, rank_ids, rank_id, device_id, rid);
 #else
     PADDLE_THROW(platform::errors::PreconditionNotMet(
         "PaddlePaddle should compile with NPU."));
@@ -84,6 +84,9 @@ Initialize collective communicatoin context within this trainer
         .SetDefault(-1);
     AddAttr<int>("ring_id", "(int default 0) user specified ring id")
         .SetDefault(0);
+    AddAttr<std::string>("group_name",
+                        "(string), e.g. world_group  "
+                        "The group id used for ECCL, which may map to ringid!");
   }
 };
 

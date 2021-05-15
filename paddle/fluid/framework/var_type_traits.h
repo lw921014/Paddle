@@ -36,10 +36,10 @@
 #endif
 #endif
 
-#ifdef PADDLE_WITH_ASCEND_CL
-#include <hccl/hccl.h>
-#include <hccl/hccl_types.h>
-#endif
+// #ifdef PADDLE_WITH_ASCEND_CL
+// #include <hccl/hccl.h>
+// #include <hccl/hccl_types.h>
+// #endif
 
 #if defined(PADDLE_WITH_XPU_BKCL)
 #include "xpu/bkcl.h"
@@ -172,7 +172,7 @@ using VarTypeRegistry = detail::VarTypeRegistryImpl<
     operators::CudnnRNNCache,
 #endif
 #if defined(PADDLE_WITH_ASCEND_CL)
-    HcclRootInfo,
+    // HcclRootInfo,
 #endif
 #if defined(PADDLE_WITH_XPU_BKCL)
     BKCLUniqueId, platform::BKCLCommunicator,
