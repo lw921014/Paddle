@@ -84,6 +84,7 @@ void Prepare(f::Scope* scope, const p::DeviceContext& ctx,
              PaddleEcclCommGroupIdType group_id) {
   int rank_id = atoi(getenv("RANK_ID"));
   int device_id = atoi(getenv("DEVICE_ID"));
+  int rank_count = atoi(getenv("RANK_COUNT"));
 
   VLOG(2) << "rank_id = " << rank_id << "; device_id = " << device_id
           << "; rank_id = " << rank_id
@@ -92,7 +93,7 @@ void Prepare(f::Scope* scope, const p::DeviceContext& ctx,
   // std::vector<int> rank_ids{0, 1};
   f::AttributeMap comm_init_attrs;
   comm_init_attrs["ring_id"] = 0;
-  comm_init_attrs["rank_ids"] = 2;
+  comm_init_attrs["rank_ids"] = rank_count;
   comm_init_attrs["rank"] = rank_id;
   comm_init_attrs["device_id"] = device_id;
   comm_init_attrs["group_name"] = group_id;

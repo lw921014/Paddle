@@ -25,6 +25,8 @@ USE_OP_DEVICE_KERNEL(c_broadcast, NPU);
 DECLARE_string(selected_npus);
 
 void TestHCCLBroadcastOp(f::Scope* scope, const p::DeviceContext& ctx) {
+  int root = atoi(getenv("ROOT_ID"));
+
   // init
   auto x = scope->Var("Data");
   auto tensor_x = x->GetMutable<f::LoDTensor>();
@@ -33,7 +35,7 @@ void TestHCCLBroadcastOp(f::Scope* scope, const p::DeviceContext& ctx) {
   int rank_id = atoi(getenv("RANK_ID"));
 
   for (int64_t i = 0; i < num * num; ++i) {
-    init.push_back(1.0 + rank_id);
+    init.push_back(rank_id);
   }
   PrintDebugInfo("input data", init);
 
@@ -51,7 +53,7 @@ void TestHCCLBroadcastOp(f::Scope* scope, const p::DeviceContext& ctx) {
   // run
   f::AttributeMap attrs;
   attrs["tag"] = std::string("tagx");
-  attrs["root"] = 0;
+  attrs["root"] = root;
   attrs["ring_id"] = 0;
 
   auto op = f::OpRegistry::CreateOp("c_broadcast", {{"X", {"Data"}}},
@@ -69,7 +71,7 @@ void TestHCCLBroadcastOp(f::Scope* scope, const p::DeviceContext& ctx) {
   PrintDebugInfo("output data", out_vec);
   EXPECT_EQ(out_vec.size(), init.size());
   for (uint32_t i = 0; i < out_vec.size(); i++) {
-    EXPECT_EQ(out_vec[i], 1.0);
+    EXPECT_EQ(out_vec[i], root);
   }
 }
 

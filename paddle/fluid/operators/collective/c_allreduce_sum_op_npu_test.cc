@@ -32,12 +32,14 @@ void TestHCCLAllReduceOp(f::Scope* scope, const p::DeviceContext& ctx,
   auto tensor_x = x->GetMutable<f::LoDTensor>();
 
   int rank_id = atoi(getenv("RANK_ID"));
+  int rank_count = atoi(getenv("RANK_COUNT"));
+  int expext_result = rank_count / 2 * (rank_count - 1);
   int num1 = 3;
   int num2 = 128;
 
   std::vector<float> init;
   for (int64_t i = 0; i < num1 * num2; ++i) {
-    init.push_back(1.0 + rank_id);
+    init.push_back(rank_id);
   }
   PrintDebugInfo("input data", init);
 
@@ -61,7 +63,7 @@ void TestHCCLAllReduceOp(f::Scope* scope, const p::DeviceContext& ctx,
   auto op = f::OpRegistry::CreateOp("c_allreduce_sum", {{"X", {"Data"}}},
                                     {{"Out", {"OutData"}}}, attrs);
 
-  for (int i = 0; i < 2048; i++) {
+  for (int i = 0; i < 1; i++) {
     op->Run(*scope, place);
   }
   ctx.Wait();
@@ -74,7 +76,7 @@ void TestHCCLAllReduceOp(f::Scope* scope, const p::DeviceContext& ctx,
 
   EXPECT_EQ(out_vec.size(), init.size());
   for (uint32_t i = 0; i < out_vec.size(); i++) {
-    EXPECT_EQ(out_vec[i], 3.0);
+    EXPECT_EQ(out_vec[i], expext_result);
   }
 }
 
