@@ -42,7 +42,7 @@ class CGenHCCLIdOp : public framework::OperatorBase {
     int rank = Attr<int>("rank");
     int rank_count = Attr<int>("rank_count");
     std::string endpoint = Attr<std::string>("endpoint");
-    EcclCommGroupIdType group_name = Attr<EcclCommGroupIdType>("group_name");
+    std::string group_name = Attr<std::string>("group_name");
     int split_index = Attr<int>("split_index");
 
     VLOG(2) << "rank = " << rank
@@ -53,7 +53,7 @@ class CGenHCCLIdOp : public framework::OperatorBase {
 
     PADDLE_ENFORCE_NPU_SUCCESS(platform::dynload::eccl_gen_unique_id(rank,
                             endpoint.c_str(), rank_count,
-                            split_index, group_name));
+                            split_index, group_name.c_str()));
 
     // framework::Scope& local_scope = scope.NewScope();
 

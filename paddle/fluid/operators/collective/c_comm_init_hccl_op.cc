@@ -42,9 +42,9 @@ class CCommInitOpAscend : public framework::OperatorBase {
                       platform::errors::PreconditionNotMet(
                           "CCommInitOpAscend can run on npu place only."));
 
-    auto var = scope.FindVar(Input("X"));
-    PADDLE_ENFORCE_NOT_NULL(
-        var, platform::errors::InvalidArgument("Input con not be empty."));
+    // auto var = scope.FindVar(Input("X"));
+    // PADDLE_ENFORCE_NOT_NULL(
+    //     var, platform::errors::InvalidArgument("Input con not be empty."));
 #if defined(PADDLE_WITH_ASCEND_CL)
     int rank_ids = Attr<int>("rank_ids");
     int rank_id = Attr<int>("rank");
@@ -53,7 +53,7 @@ class CCommInitOpAscend : public framework::OperatorBase {
     if (Attr<int>("device_id") >= 0) {
       device_id = Attr<int>("device_id");
     }
-    EcclCommGroupIdType group_name = Attr<EcclCommGroupIdType>("group_name");
+    std::string group_name = Attr<std::string>("group_name");
 
     platform::HCCLCommContext::Instance().CreateHCCLComm(
         group_name, rank_ids, rank_id, device_id, rid);
@@ -67,7 +67,7 @@ class CCommInitOpAscend : public framework::OperatorBase {
 class CCommInitOpAscendMaker : public framework::OpProtoAndCheckerMaker {
  public:
   void Make() override {
-    AddInput("X", "Raw variable contains a NCCL UniqueId instaces.");
+    // AddInput("X", "Raw variable contains a NCCL UniqueId instaces.");
     AddComment(R"DOC(
 CCommInit operator
 

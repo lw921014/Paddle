@@ -60,8 +60,9 @@ using EcclInitConfig = struct EcclInitConfig_t {
 };
 
 // group id
-using EcclCommGroupIdType = std::string;
-const std::string ECCL_COMM_GLOBAL_GROUP_ID = "__ECCL_COMM_GLOBAL_GROUP__";
+using PaddleEcclCommGroupIdType = std::string;
+using EcclCommGroupIdType = const char*;
+#define ECCL_COMM_GLOBAL_GROUP_ID  "__ECCL_COMM_GLOBAL_GROUP__"
 
 // result
 using EcclResult = enum EcclResult_t {
@@ -114,7 +115,8 @@ using EcclMemcpyType = enum EcclMemcpyType_t {
 
 
 // device types
-using EcclDeviceType = std::string;
+// using EcclDeviceType = std::string;
+using EcclDeviceType = const char*;
 
 // stream
 using EcclRuntimeStream = void*;

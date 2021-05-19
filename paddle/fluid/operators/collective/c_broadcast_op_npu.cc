@@ -55,7 +55,7 @@ class CBroadcastOpASCENDKernel : public framework::OpKernel<T> {
             << ", comm: " << comm->comm() << ", stream: " << stream;
 
     PADDLE_ENFORCE_NPU_SUCCESS(platform::dynload::eccl_broadcast(
-        ptr, out_ptr, numel, dtype, root, comm->comm(), stream, AUTO));
+        ptr, out_ptr, numel, dtype, root, comm->comm().c_str(), stream, AUTO));
 
     VLOG(3) << "rank " << comm->rank() << " invoke Bcast. recieved "
             << framework::product(out->dims());

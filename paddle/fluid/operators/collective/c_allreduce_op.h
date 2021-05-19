@@ -175,7 +175,7 @@ class CAllReduceOpASCENDKernel : public framework::OpKernel<T> {
             << "hccl_red_type: " << hccl_red_type << ", group is: " << group;
 
     PADDLE_ENFORCE_NPU_SUCCESS(platform::dynload::eccl_all_reduce(
-        sendbuff, recvbuff, numel, dtype, hccl_red_type, comm->comm(),
+        sendbuff, recvbuff, numel, dtype, hccl_red_type, comm->comm().c_str(),
         reinterpret_cast<void*>(stream), AUTO));
 
     out->Resize(in->dims());

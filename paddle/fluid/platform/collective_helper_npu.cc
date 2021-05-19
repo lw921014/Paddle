@@ -35,11 +35,11 @@ class HCCLCommImpl : public HCCLComm {
   }
 
   ~HCCLCommImpl() {
-    PADDLE_ENFORCE_NPU_SUCCESS(platform::dynload::eccl_destroy_comm_global(comm_));
+    PADDLE_ENFORCE_NPU_SUCCESS(platform::dynload::eccl_destroy_comm_global(comm_.c_str()));
   }
 
-  void set_comm(EcclCommGroupIdType comm) { comm_ = comm; }
-  EcclCommGroupIdType comm() const override { return comm_; }
+  void set_comm(PaddleEcclCommGroupIdType comm) { comm_ = comm; }
+  PaddleEcclCommGroupIdType comm() const override { return comm_; }
 
   aclrtStream stream() const override { return dev_ctx_->stream(); }
 
@@ -52,11 +52,11 @@ class HCCLCommImpl : public HCCLComm {
   int ring_id_;
   int nranks_;
   int rank_;
-  EcclCommGroupIdType comm_;
+  PaddleEcclCommGroupIdType comm_;
   std::unique_ptr<NPUDeviceContext> dev_ctx_;
 };
 
-HCCLComm* HCCLCommContext::CreateHCCLComm(EcclCommGroupIdType group_name, int nranks,
+HCCLComm* HCCLCommContext::CreateHCCLComm(PaddleEcclCommGroupIdType group_name, int nranks,
                                           int rank, int dev_id, int ring_id) {
   PADDLE_ENFORCE_GT(
       nranks, 1,
@@ -79,7 +79,7 @@ HCCLComm* HCCLCommContext::CreateHCCLComm(EcclCommGroupIdType group_name, int nr
   VLOG(1) << "initialized comm: " << group_name << ", nranks: " << nranks
           << ", rank: " << rank;
   PADDLE_ENFORCE_NPU_SUCCESS(
-      platform::dynload::eccl_init_comm_global(nranks, rank, "CPU", dev_id, group_name));
+      platform::dynload::eccl_init_comm_global(nranks, rank, "CPU", dev_id, group_name.c_str()));
 
   VLOG(1) << "initialized comm: " << group_name << ", nranks: " << nranks
           << ", rank: " << rank;
@@ -97,7 +97,7 @@ HCCLComm* HCCLCommContext::CreateHCCLComm(EcclCommGroupIdType group_name, int nr
   return comm_wrapper;
 }
 
-HCCLComm* HCCLCommContext::AssignHCCLComm(EcclCommGroupIdType group_name, int nranks, int rank,
+HCCLComm* HCCLCommContext::AssignHCCLComm(PaddleEcclCommGroupIdType group_name, int nranks, int rank,
                                           int dev_id, int ring_id) {
   std::unique_ptr<NPUDeviceContext> dev_ctx(
       new NPUDeviceContext(NPUPlace(dev_id)));

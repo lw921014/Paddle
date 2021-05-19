@@ -80,7 +80,7 @@ void TestHCCLAllReduceOp(f::Scope* scope, const p::DeviceContext& ctx,
 
 TEST(c_allreduce_sum, NPU) {
   f::Scope scope;
-  EcclCommGroupIdType group_name = "test_group_1";
+  PaddleEcclCommGroupIdType group_name = "test_group_1";
 
   p::NPUDeviceContext ctx(p::NPUPlace(atoi(FLAGS_selected_npus.c_str())));
 

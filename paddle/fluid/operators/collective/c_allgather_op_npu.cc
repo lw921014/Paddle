@@ -61,7 +61,7 @@ class CAllGatherOpASCENDKernel : public framework::OpKernel<T> {
             << ", nranks is " << nranks;
 
     PADDLE_ENFORCE_NPU_SUCCESS(platform::dynload::eccl_all_gather(
-        send_buff, recv_buff, send_numel, dtype, comm->comm(),
+        send_buff, recv_buff, send_numel, dtype, comm->comm().c_str(),
         reinterpret_cast<void *>(stream), AUTO));
 
 #else

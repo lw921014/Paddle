@@ -65,7 +65,7 @@ class CReduceScatterOpAscendKernel : public framework::OpKernel<T> {
             << "hccl_red_type: " << SUM << ", group is: " << group;
 
     PADDLE_ENFORCE_NPU_SUCCESS(platform::dynload::eccl_reduce_scatter(
-        inputPtr, outputPtr, recv_numel, dtype, SUM, comm->comm(),
+        inputPtr, outputPtr, recv_numel, dtype, SUM, comm->comm().c_str(),
         reinterpret_cast<void*>(stream), AUTO));
 #else
     PADDLE_THROW(platform::errors::PreconditionNotMet(

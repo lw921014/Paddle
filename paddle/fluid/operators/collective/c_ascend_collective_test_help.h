@@ -51,7 +51,7 @@ void PrintDebugInfo(const std::string preStr, const std::vector<T>& data) {
 }
 
 void PrepareUniqueId(f::Scope* scope, const p::DeviceContext& ctx,
-                     EcclCommGroupIdType group_id) {
+                     PaddleEcclCommGroupIdType group_id) {
   int rank_id = atoi(getenv("RANK_ID"));
   int device_id = atoi(getenv("DEVICE_ID"));
   int rank_count = atoi(getenv("RANK_COUNT"));
@@ -68,8 +68,8 @@ void PrepareUniqueId(f::Scope* scope, const p::DeviceContext& ctx,
 
   gen_hccl_id["rank"] = rank_id;
   gen_hccl_id["rank_count"] = rank_count;
-  gen_hccl_id["endpoint"] = endpoint;
-  gen_hccl_id["group_name"] = group_id;
+  gen_hccl_id["endpoint"] = std::string(endpoint);
+  gen_hccl_id["group_name"] = std::string(group_id);
   gen_hccl_id["split_index"] = split_index;
 
   auto comm_init_op = f::OpRegistry::CreateOp("c_gen_hccl_id", {},
@@ -81,7 +81,7 @@ void PrepareUniqueId(f::Scope* scope, const p::DeviceContext& ctx,
 }
 
 void Prepare(f::Scope* scope, const p::DeviceContext& ctx,
-             EcclCommGroupIdType group_id) {
+             PaddleEcclCommGroupIdType group_id) {
   int rank_id = atoi(getenv("RANK_ID"));
   int device_id = atoi(getenv("DEVICE_ID"));
 

@@ -30,7 +30,7 @@ class CRecvOpASCENDKernel : public framework::OpKernel<T> {
     auto x = ctx.Output<framework::LoDTensor>("Out");
     void* ptr = reinterpret_cast<void*>(const_cast<T*>(x->data<T>()));
     int numel = x->numel();
-    HcclDataType dtype = platform::ToHCCLDataType(x->type());
+    EcclDataType dtype = platform::ToHCCLDataType(x->type());
 
     int ring_id = ctx.Attr<int>("ring_id");
     auto place = ctx.GetPlace();
@@ -57,9 +57,8 @@ class CRecvOpASCENDKernel : public framework::OpKernel<T> {
             << "root " << root << ", comm: " << comm->comm()
             << ", stream: " << stream;
 
-    PADDLE_ENFORCE_NPU_SUCCESS(platform::dynload::HcclBroadcast(
-        ptr, numel, dtype, (uint32_t)root, comm->comm(), stream));
-
+    PADDLE_ENFORCE_NPU_SUCCESS(platform::dynload::eccl_broadcast(
+        ptr, ptr, numel, dtype, root, comm->comm().c_str(), stream, AUTO));
 #else
     PADDLE_THROW(platform::errors::PreconditionNotMet(
         "PaddlePaddle should compile with NPU."));

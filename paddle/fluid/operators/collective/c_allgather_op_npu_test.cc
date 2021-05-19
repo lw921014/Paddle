@@ -82,7 +82,7 @@ void TestHCCLAllGatherOp(f::Scope* scope, const p::DeviceContext& ctx) {
 
 TEST(c_allgather, NPU) {
   f::Scope scope;
-  EcclCommGroupIdType group_name = "test_group_1";
+  PaddleEcclCommGroupIdType group_name = "test_group_1";
 
   // only support one device, if more than one device, use first default
   p::NPUDeviceContext ctx(p::NPUPlace(atoi(FLAGS_selected_npus.c_str())));

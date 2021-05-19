@@ -200,10 +200,10 @@ class NPUDeviceContext : public DeviceContext {
 
 #if defined(PADDLE_WITH_ASCEND_CL)
   /*! \brief  Return hccl communicators. */
-  EcclCommGroupIdType hccl_comm() const { return hccl_comm_; }
+  PaddleEcclCommGroupIdType hccl_comm() const { return hccl_comm_; }
 
   /*! \brief  Set hccl communicators. */
-  void set_hccl_comm(EcclCommGroupIdType comm) { hccl_comm_ = comm; }
+  void set_hccl_comm(PaddleEcclCommGroupIdType comm) { hccl_comm_ = comm; }
 #endif
 
   // template <typename Callback>
@@ -219,7 +219,7 @@ class NPUDeviceContext : public DeviceContext {
 
 #ifdef PADDLE_WITH_ASCEND_CL
   // HCCLContext_t hccl_context_;
-  EcclCommGroupIdType hccl_comm_;
+  PaddleEcclCommGroupIdType hccl_comm_;
 #endif
 
   // Need to be the same with other DeviceContext,
