@@ -43,6 +43,13 @@ DEFINE_string(hccl_dir, "",
               "default, "
               "dlopen will search hccl from LD_LIBRARY_PATH");
 
+DEFINE_string(eccl_dir, "",
+              "Specify path for loading eccl library, such as libeccl.so. "
+              "For instance, "
+              "/usr/local/Ascend/ascend-toolkit/latest/fwkacllib/lib64/. If "
+              "default, "
+              "dlopen will search hccl from LD_LIBRARY_PATH");
+
 DEFINE_string(cupti_dir, "", "Specify path for loading cupti.so.");
 
 DEFINE_string(
@@ -431,6 +438,19 @@ void* GetHCCLDsoHandle() {
                                     warning_msg);
 #else
   return GetDsoHandleFromSearchPath(FLAGS_nccl_dir, "libnccl.so", true, {},
+                                    warning_msg);
+#endif
+}
+
+void* GeteECCLDsoHandle() {
+  std::string warning_msg(
+      "You may need to install 'eccl' from baidu official website: "
+      "before install PaddlePaddle.");
+#if defined(__APPLE__) || defined(__OSX__)
+  return GetDsoHandleFromSearchPath(FLAGS_eccl_dir, "libeccl.dylib", true, {},
+                                    warning_msg);
+#else
+  return GetDsoHandleFromSearchPath(FLAGS_eccl_dir, "libeccl.so", true, {},
                                     warning_msg);
 #endif
 }

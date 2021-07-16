@@ -1202,5 +1202,41 @@ inline std::string build_npu_error_msg(HcclResult stat) {
   } while (0)
 #endif  // PADDLE_WITH_ASCEND_CL
 
+#ifdef PADDLE_WITH_ECCL
+namespace details {
+template <typename T>
+struct NPUStatusType {};
+
+#define DEFINE_NPU_STATUS_TYPE(type, success_value) \
+  template <>                                       \
+  struct NPUStatusType<type> {                      \
+    using Type = type;                              \
+    static constexpr Type kSuccess = success_value; \
+  }
+
+DEFINE_NPU_STATUS_TYPE(EcclResult, SUCCESS);
+}  // namespace details
+
+inline std::string build_npu_error_msg(EcclResult stat) {
+  std::ostringstream sout;
+  sout << " ECCL error, the error code is : " << stat << ". ";
+  return sout.str();
+}
+
+#define PADDLE_ENFORCE_ECCL_SUCCESS(COND)                       \
+  do {                                                         \
+    auto __cond__ = (COND);                                    \
+    using __NPU_STATUS_TYPE__ = decltype(__cond__);            \
+    constexpr auto __success_type__ =                          \
+        ::paddle::platform::details::NPUStatusType<            \
+            __NPU_STATUS_TYPE__>::kSuccess;                    \
+    if (UNLIKELY(__cond__ != __success_type__)) {              \
+      auto __summary__ = ::paddle::platform::errors::External( \
+          ::paddle::platform::build_npu_error_msg(__cond__));  \
+      __THROW_ERROR_INTERNAL__(__summary__);                   \
+    }                                                          \
+  } while (0)
+#endif  // PADDLE_WITH_ECCL
+
 }  // namespace platform
 }  // namespace paddle

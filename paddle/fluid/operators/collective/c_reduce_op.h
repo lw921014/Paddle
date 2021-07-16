@@ -25,7 +25,8 @@ limitations under the License. */
 #include "paddle/fluid/framework/op_registry.h"
 
 #if defined(PADDLE_WITH_NCCL) || defined(PADDLE_WITH_RCCL) || \
-    defined(PADDLE_WITH_XPU_BKCL) || defined(PADDLE_WITH_ASCEND_CL)
+    defined(PADDLE_WITH_XPU_BKCL) || defined(PADDLE_WITH_ASCEND_CL) || \
+    defined(PADDLE_WITH_ECCL)
 #include "paddle/fluid/platform/collective_helper.h"
 #endif
 
@@ -44,6 +45,10 @@ limitations under the License. */
 
 #if defined(PADDLE_WITH_ASCEND_CL)
 #include "paddle/fluid/platform/hccl_helper.h"
+#endif
+
+#if defined(PADDLE_WITH_ECCL)
+#include "paddle/fluid/platform/eccl_helper.h"
 #endif
 
 namespace paddle {
@@ -185,6 +190,85 @@ class CReduceOpASCENDKernel : public framework::OpKernel<T> {
     PADDLE_ENFORCE_NPU_SUCCESS(platform::dynload::HcclAllReduce(
         sendbuff, recvbuff, numel, dtype, hccl_red_type, comm->comm(),
         reinterpret_cast<void*>(stream)));
+
+    if (rank_id != root_id) {
+      auto npu_place = BOOST_GET_CONST(platform::NPUPlace, place);
+      memory::Copy(npu_place, reinterpret_cast<void*>(out->data<T>()),
+                   npu_place,
+                   reinterpret_cast<void*>(const_cast<T*>(in->data<T>())),
+                   numel * sizeof(T), stream);
+    }
+
+    out->Resize(in->dims());
+#else
+    PADDLE_THROW(platform::errors::PreconditionNotMet(
+        "PaddlePaddle should compile with NPU."));
+#endif
+  }
+};
+
+template <ReduceType red_type, typename T>
+class CReduceOpECCLKernel : public framework::OpKernel<T> {
+ public:
+  void Compute(const framework::ExecutionContext& ctx) const override {
+#if defined(PADDLE_WITH_ECCL)
+    auto in = ctx.Input<framework::LoDTensor>("X");
+    auto out = ctx.Output<framework::LoDTensor>("Out");
+    auto place = ctx.GetPlace();
+    EcclDataType dtype = platform::ToECCLDataType(in->type());
+    int64_t numel = in->numel();
+
+    void* sendbuff = reinterpret_cast<void*>(const_cast<T*>(in->data<T>()));
+    void* recvbuff = reinterpret_cast<void*>(out->data<T>());
+
+    int ring_id = ctx.Attr<int>("ring_id");
+    int root_id = ctx.Attr<int>("root_id");
+    std::string group =
+        std::string(HCOM_GROUP_PREFIX) + std::to_string(ring_id);
+    auto comm =
+        paddle::platform::ECCLCommContext::Instance().Get(ring_id, place);
+
+    aclrtStream stream = nullptr;
+    auto dev_ctx = platform::DeviceContextPool::Instance().Get(place);
+    if (ctx.Attr<bool>("use_calc_stream")) {
+      stream = static_cast<platform::NPUDeviceContext*>(dev_ctx)->stream();
+    } else {
+      stream = comm->stream();
+    }
+
+    int rank_id = comm->rank();
+
+    EcclReductionOp eccl_red_type = SUM;
+    switch (red_type) {
+      case kRedSum:
+        eccl_red_type = SUM;
+        break;
+
+      case kRedMax:
+        eccl_red_type = MAX;
+        break;
+
+      case kRedMin:
+        eccl_red_type = MIN;
+        break;
+
+      case kRedProd:
+        eccl_red_type = PROD;
+        break;
+
+      default:
+        PADDLE_THROW(platform::errors::InvalidArgument(
+            "Invalid reduce type: %d", red_type));
+    }
+
+    VLOG(3) << "begin eccl reduce, parameter is: "
+            << "input num: " << numel << "root_id: " << root_id
+            << "dtype: " << dtype << "eccl_red_type: " << eccl_red_type
+            << ", group is: " << group;
+
+    PADDLE_ENFORCE_ECCL_SUCCESS(platform::dynload::eccl_all_reduce(
+        sendbuff, recvbuff, numel, dtype, eccl_red_type, comm->comm().c_str(),
+        reinterpret_cast<void*>(stream), AUTO));
 
     if (rank_id != root_id) {
       auto npu_place = BOOST_GET_CONST(platform::NPUPlace, place);
