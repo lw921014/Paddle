@@ -25,7 +25,7 @@ limitations under the License. */
 #include "paddle/fluid/framework/op_registry.h"
 
 #if defined(PADDLE_WITH_NCCL) || defined(PADDLE_WITH_RCCL) || \
-    defined(PADDLE_WITH_XPU_BKCL) || defined(PADDLE_WITH_ASCEND_CL) || \
+    defined(PADDLE_WITH_XPU_BKCL) || defined(PADDLE_WITH_HCCL) || \
     defined(PADDLE_WITH_ECCL)
 #include "paddle/fluid/platform/collective_helper.h"
 #endif
@@ -43,7 +43,7 @@ limitations under the License. */
 #include "paddle/fluid/framework/fleet/gloo_wrapper.h"
 #endif
 
-#if defined(PADDLE_WITH_ASCEND_CL)
+#if defined(PADDLE_WITH_HCCL)
 #include "paddle/fluid/platform/hccl_helper.h"
 #endif
 
@@ -132,7 +132,7 @@ template <ReduceType red_type, typename T>
 class CReduceOpASCENDKernel : public framework::OpKernel<T> {
  public:
   void Compute(const framework::ExecutionContext& ctx) const override {
-#if defined(PADDLE_WITH_ASCEND_CL)
+#if defined(PADDLE_WITH_HCCL)
     auto in = ctx.Input<framework::LoDTensor>("X");
     auto out = ctx.Output<framework::LoDTensor>("Out");
     auto place = ctx.GetPlace();
@@ -418,7 +418,7 @@ class CReduceOpMaker : public framework::OpProtoAndCheckerMaker {
     AddOutput("Out", "(Tensor) the reduced result.");
     AddAttr<int>("ring_id", "(int default 0) communication ring id.")
         .SetDefault(0);
-#if defined(PADDLE_WITH_ASCEND_CL)
+#if defined(PADDLE_WITH_HCCL) || defined(PADDLE_WITH_ECCL)
     AddAttr<std::string>("tag", "(string default tag) tag for reduce.")
         .SetDefault("tag");
 #endif

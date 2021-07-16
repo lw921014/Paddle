@@ -14,9 +14,9 @@ limitations under the License. */
 
 #include "paddle/fluid/operators/collective/recv_v2_op.h"
 
-#if defined(PADDLE_WITH_ASCEND_CL)
+#if defined(PADDLE_WITH_ECCL)
 #include "paddle/fluid/platform/collective_helper.h"
-#include "paddle/fluid/platform/hccl_helper.h"
+#include "paddle/fluid/platform/eccl_helper.h"
 #endif
 
 namespace paddle {
@@ -26,7 +26,7 @@ template <typename T>
 class CRecvOpASCENDKernel : public framework::OpKernel<T> {
  public:
   void Compute(const framework::ExecutionContext& ctx) const override {
-#if defined(PADDLE_WITH_ASCEND_CL)
+#if defined(PADDLE_WITH_ECCL)
     auto out = ctx.Output<framework::LoDTensor>("Out");
     out->mutable_data<T>(out->dims(), ctx.GetPlace());
     void* ptr = reinterpret_cast<void*>(const_cast<T*>(out->data<T>()));

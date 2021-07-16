@@ -19,7 +19,7 @@ limitations under the License. */
 #include "paddle/fluid/platform/nccl_helper.h"
 #endif
 
-#if defined(PADDLE_WITH_ASCEND_CL)
+#if defined(PADDLE_WITH_HCCL)
 #include "paddle/fluid/platform/collective_helper.h"
 #include "paddle/fluid/platform/hccl_helper.h"
 #endif
@@ -73,7 +73,7 @@ class CSyncCommStreamKernel : public framework::OpKernel<T> {
     PADDLE_ENFORCE_CUDA_SUCCESS(cudaStreamSynchronize(stream));
 #endif
 
-#elif defined(PADDLE_WITH_ASCEND_CL)
+#elif defined(PADDLE_WITH_HCCL)
     PADDLE_ENFORCE_EQ(is_npu_place(place), true,
                       platform::errors::PreconditionNotMet(
                           "Sync stream op can run on npu place only for now."));
