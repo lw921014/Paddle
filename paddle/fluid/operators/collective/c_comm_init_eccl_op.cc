@@ -52,7 +52,7 @@ class CCommInitOpECCL : public framework::OperatorBase {
     }
     std::string group_name = Attr<std::string>("group_name");
 
-    platform::HCCLCommContext::Instance().CreateHCCLComm(
+    platform::ECCLCommContext::Instance().CreateECCLComm(
         group_name, rank_ids, rank_id, device_id, rid);
 #else
     PADDLE_THROW(platform::errors::PreconditionNotMet(

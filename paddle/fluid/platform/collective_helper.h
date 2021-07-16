@@ -23,6 +23,7 @@
 #include "paddle/fluid/framework/data_type.h"
 #include "paddle/fluid/platform/device_context.h"
 #include "paddle/fluid/platform/dynload/hccl.h"
+#include "paddle/fluid/platform/dynload/eccl.h"
 #include "paddle/fluid/platform/enforce.h"
 
 namespace paddle {

@@ -37,7 +37,7 @@ extern void* eccl_dso_handle;
     auto operator()(Args... args) -> decltype(__name(args...)) {         \
       using eccl_func = decltype(&::__name);                             \
       std::call_once(eccl_dso_flag, []() {                               \
-        eccl_dso_handle = paddle::platform::dynload::GeteECCLDsoHandle(); \
+        eccl_dso_handle = paddle::platform::dynload::GetECCLDsoHandle(); \
       });                                                                \
       static void* p_##__name = dlsym(eccl_dso_handle, #__name);         \
       return reinterpret_cast<eccl_func>(p_##__name)(args...);           \

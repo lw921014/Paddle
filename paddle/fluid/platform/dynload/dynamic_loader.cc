@@ -442,7 +442,7 @@ void* GetHCCLDsoHandle() {
 #endif
 }
 
-void* GeteECCLDsoHandle() {
+void* GetECCLDsoHandle() {
   std::string warning_msg(
       "You may need to install 'eccl' from baidu official website: "
       "before install PaddlePaddle.");
