@@ -42,7 +42,7 @@ class CCommInitOpECCL : public framework::OperatorBase {
                       platform::errors::PreconditionNotMet(
                           "CCommInitOpECCL can run on npu place only."));
 
-#if defined(PADDLE_WITH_ASCEND_CL)
+#if defined(PADDLE_WITH_ECCL)
     int rank_ids = Attr<int>("rank_ids");
     int rank_id = Attr<int>("rank");
     int rid = Attr<int>("ring_id");

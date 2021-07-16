@@ -61,7 +61,7 @@ class CSyncCalcStreamKernel : public framework::OpKernel<T> {
     PADDLE_ENFORCE_CUDA_SUCCESS(cudaStreamSynchronize(dev_ctx->stream()));
 #endif
 
-#elif defined(PADDLE_WITH_ASCEND_CL) && !defined(_WIN32)
+#elif defined(PADDLE_WITH_HCCL) && !defined(_WIN32)
     auto place = ctx.GetPlace();
     PADDLE_ENFORCE_EQ(is_npu_place(place), true,
                       platform::errors::PreconditionNotMet(

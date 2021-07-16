@@ -433,7 +433,7 @@ void* GetHCCLDsoHandle() {
 #elif defined(PADDLE_WITH_HIP) && defined(PADDLE_WITH_RCCL)
   return GetDsoHandleFromSearchPath(FLAGS_rccl_dir, "librccl.so", true);
 
-#elif defined(PADDLE_WITH_ASCEND_CL)
+#elif defined(PADDLE_WITH_HCCL)
   return GetDsoHandleFromSearchPath(FLAGS_hccl_dir, "libhccl.so", true, {},
                                     warning_msg);
 #else

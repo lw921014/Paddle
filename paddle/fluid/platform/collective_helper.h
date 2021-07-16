@@ -127,7 +127,7 @@ class NCCLCommContext {
 };
 #endif
 
-#if defined(PADDLE_WITH_ASCEND_CL)
+#if defined(PADDLE_WITH_HCCL)
 // In order to apply hierarchical communication with HCCL, we need
 // a communication ring contains HCCL communicators associated to a global
 // HCCLUniqueId. E.g. for a hierarchical case,
